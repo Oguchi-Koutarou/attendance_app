@@ -3,33 +3,8 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# --- パスワード認証機能 ---
-def check_password():
-    if "authenticated" not in st.session_state:
-        st.session_state["authenticated"] = False
-
-    if st.session_state["authenticated"]:
-        return True
-
-    st.title("🔒 ログイン認証")
-    st.write("イベントの出欠アンケートです。パスワードを入力してください。")
-    
-    input_password = st.text_input("パスワードを入力", type="password")
-    
-    if st.button("ログイン"):
-        if input_password == "inverter":  # 回答者用のパスワード
-            st.session_state["authenticated"] = True
-            st.rerun()
-        else:
-            st.error("⚠️ パスワードが間違っています。")
-            
-    return False
-
-if not check_password():
-    st.stop()
-
 # ==========================================
-# アンケート回答画面（管理者画面なし）
+# アンケート回答画面（パスワード認証なし）
 # ==========================================
 st.title("TMU Annual Research Forum")
 st.write("以下のフォームに必要事項を入力して送信してください。")
@@ -93,8 +68,3 @@ with st.form("attendance_form"):
                 new_data.to_csv(file_name, index=False, encoding='utf-8-sig')
                 
             st.success(f"🎉 {name_kanji}さんの回答を受け付けました！ご協力ありがとうございます。")
-
-st.write("---")
-if st.button("ログアウトする"):
-    st.session_state["authenticated"] = False
-    st.rerun()
