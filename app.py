@@ -3,68 +3,65 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# ==========================================
-# アンケート回答画面（パスワード認証なし）
-# ==========================================
 st.title("TMU Annual Research Forum")
 st.write("以下のフォームに必要事項を入力して送信してください。")
 
-with st.form("attendance_form"):
-    st.subheader("1. 基本情報")
-    name_kanji = st.text_input("お名前（漢字） *")
-    name_furigana = st.text_input("お名前（ふりがな） *")
+# 1. 基本情報
+name_kanji = st.text_input("お名前（漢字） *")
+name_furigana = st.text_input("お名前（ふりがな） *")
+
+st.subheader("2. 参加の是非")
+# 変更された瞬間に画面を再描画するために key と on_change またはラジオの戻り値を利用
+attendance_status = st.radio("イベントへの参加について", ["参加", "不参加"])
+
+# 初期値
+days_choice = "ー"
+friday_party = "ー"
+saturday_party = "ー"
+occupation = "ー"
+
+# 「参加」の場合のみ、以降の項目を表示する
+if attendance_status == "参加":
+    st.markdown("---")
+    st.subheader("3. 参加日程について")
+    days_choice = st.radio(
+        "参加される日程をお選びください *", 
+        ["両日参加", "金曜のみ参加", "土曜のみ参加"]
+    )
     
-    st.subheader("2. 参加の是非")
-    attendance_status = st.radio("イベントへの参加について", ["参加", "不参加"])
+    st.markdown("---")
+    st.subheader("4. 懇親会への参加について")
+    friday_party = st.radio("金曜夜の懇親会（4,500 円/人）への参加", ["参加", "不参加"])
+    saturday_party = st.radio("土曜夜の懇親会（3,000 円/人）への参加", ["参加", "不参加"])
     
-    # 初期値（不参加の場合のデフォルト値）
-    days_choice = "ー"
-    friday_party = "ー"
-    saturday_party = "ー"
-    occupation = "ー"
-    
-    # 「参加」を選んだ場合のみ、以降の質問項目を表示する
-    if attendance_status == "参加":
-        st.markdown("---")
-        st.subheader("3. 参加日程について")
-        days_choice = st.radio(
-            "参加される日程をお選びください *", 
-            ["両日参加", "金曜のみ参加", "土曜のみ参加"]
-        )
+    st.markdown("---")
+    st.subheader("5. 属性情報")
+    occupation = st.selectbox("職業をお選びください *", ["学生", "教員", "企業", "その他"])
+
+st.markdown("---")
+# フォームタグを使わず、通常のボタンにすることで「不参加」選択時の即時非表示と両立させます
+if st.button("回答を送信する", type="primary"):
+    if not name_kanji or not name_furigana:
+        st.warning("⚠️ お名前（漢字とふりがな）は必須です。入力してください。")
+    else:
+        file_name = "secret_attendance_results.csv"
         
-        st.markdown("---")
-        st.subheader("4. 懇親会への参加について")
-        friday_party = st.radio("金曜夜の懇親会（4,500 円/人）への参加", ["参加", "不参加"])
-        saturday_party = st.radio("土曜夜の懇親会（3,000 円/人）への参加", ["参加", "不参加"])
+        # 回答データの作成
+        new_data = pd.DataFrame([{
+            "日時": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "お名前（漢字）": name_kanji,
+            "お名前（ふりがな）": name_furigana,
+            "出欠": attendance_status,
+            "参加日程": days_choice,
+            "金曜懇親会": friday_party,
+            "土曜懇親会": saturday_party,
+            "職業": occupation
+        }])
         
-        st.markdown("---")
-        st.subheader("5. 属性情報")
-        occupation = st.selectbox("職業をお選びください *", ["学生", "教員", "企業", "その他"])
-    
-    submitted = st.form_submit_button("回答を送信する")
-    
-    if submitted:
-        if not name_kanji or not name_furigana:
-            st.warning("⚠️ お名前（漢字とふりがな）は必須です。入力してください。")
+        # クラウド（ローカルファイル）に自動追記・保存
+        if os.path.exists(file_name):
+            new_data.to_csv(file_name, mode='a', header=False, index=False, encoding='utf-8-sig')
         else:
-            file_name = "secret_attendance_results.csv"
+            new_data.to_csv(file_name, index=False, encoding='utf-8-sig')
             
-            # 回答データの作成
-            new_data = pd.DataFrame([{
-                "日時": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "お名前（漢字）": name_kanji,
-                "お名前（ふりがな）": name_furigana,
-                "出欠": attendance_status,
-                "参加日程": days_choice,
-                "金曜懇親会": friday_party,
-                "土曜懇親会": saturday_party,
-                "職業": occupation
-            }])
-            
-            # クラウド（ローカルファイル）に自動追記・保存
-            if os.path.exists(file_name):
-                new_data.to_csv(file_name, mode='a', header=False, index=False, encoding='utf-8-sig')
-            else:
-                new_data.to_csv(file_name, index=False, encoding='utf-8-sig')
-                
-            st.success(f"🎉 {name_kanji}さんの回答を受け付けました！ご協力ありがとうございます。")
+        st.success(f"🎉 {name_kanji}さんの回答を受け付けました！ご協力ありがとうございます。")
