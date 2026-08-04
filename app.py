@@ -82,8 +82,8 @@ elif st.session_state["page"] == "user":
         
         st.markdown("---")
         st.subheader("4. 懇親会への参加について")
-        friday_party = st.radio("金曜夜の懇親会（4,500 円/人）への参加", ["参加", "不参加"])
-        saturday_party = st.radio("土曜夜の懇親会（3,000 円/人）への参加", ["参加", "不参加"])
+        friday_party = st.radio("金曜夜の懇親会（5,000 円/人 予定）への参加", ["参加", "不参加"])
+        saturday_party = st.radio("土曜夜の懇親会（大人5,000 円/人，学生3,000 円/人 予定）への参加", ["参加", "不参加"])
         
         st.markdown("---")
         st.subheader("5. 属性情報")
