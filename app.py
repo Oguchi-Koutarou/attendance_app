@@ -64,7 +64,7 @@ elif st.session_state["page"] == "user":
     name_kanji = st.text_input("お名前（漢字） *")
     name_furigana = st.text_input("お名前（ふりがな） *")
 
-    st.subheader("2. 参加の是非")
+    st.subheader("2. 参加の確認")
     attendance_status = st.radio("イベントへの参加について", ["参加", "不参加"])
 
     days_choice = "ー"
@@ -86,7 +86,7 @@ elif st.session_state["page"] == "user":
         saturday_party = st.radio("土曜夜の懇親会（大人5,000 円/人，学生3,000 円/人 予定）への参加", ["参加", "不参加"])
         
         st.markdown("---")
-        st.subheader("5. 属性情報")
+        st.subheader("5. 職業")
         occupation = st.selectbox("職業をお選びください *", ["学生", "教員", "企業", "その他"])
 
     st.markdown("---")
