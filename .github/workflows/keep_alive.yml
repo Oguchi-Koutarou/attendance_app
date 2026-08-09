@@ -2,9 +2,9 @@ name: Keep Streamlit Alive
 
 on:
   schedule:
-    # 毎日1回、UTC（協定世界時）の0時（日本時間の朝9時）に実行
-    - cron: '0 0 * * *'
-  workflow_dispatch: # 手動でもテスト実行できるようにするボタン
+    # 1時間ごとに実行
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   ping:
