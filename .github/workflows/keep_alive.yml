@@ -3,7 +3,7 @@ name: Selenium Keep Alive
 on:
   schedule:
     # 1時間ごとに実行
-    - cron: '*/5 * * * *'
+    - cron: '*/3 * * * *'
   workflow_dispatch:
 
 jobs:
