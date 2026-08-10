@@ -1,15 +1,32 @@
-name: Keep Streamlit Alive
+name: Selenium Keep Alive
 
 on:
   schedule:
     # 1時間ごとに実行
-    - cron: '0 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
-  ping:
+  run-selenium:
     runs-on: ubuntu-latest
     steps:
-      - name: Send HTTP request to Streamlit app
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
         run: |
-          curl -I https://27nov-tmu-reunion-questionnaire.streamlit.app/
+          pip install selenium
+
+      - name: Set up Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: latest
+
+      - name: Run Selenium script
+        run: |
+          python keep_alive_selenium.py
