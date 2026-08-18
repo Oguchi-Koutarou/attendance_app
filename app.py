@@ -1,7 +1,9 @@
 import streamlit as st
-import pandas as pd
 from datetime import datetime
-import os
+import requests
+
+# ★ここに、先ほどデプロイしたGoogle Apps ScriptのウェブアプリのURLを貼り付けてください
+GAS_URL = "https://script.google.com/macros/s/AKfycbxmYi3zgPNbPqovN-99kbnTQjrczsXfvRxWF4GG2OA916UyFvyCDqJM-7gWI6Qj7JyMbg/exec" # https://script.google.com/macros/s/ここにあなたのGASのURLを貼り付け/exec"
 
 # セッション状態の初期化
 if "page" not in st.session_state:
@@ -35,18 +37,10 @@ if st.session_state["page"] == "admin":
         st.title("📊 管理者専用ページ")
         st.success("管理者としてログインしました。")
         
-        st.write("### 回答データのダウンロード")
-        file_name = "secret_attendance_results.csv"
-        if os.path.exists(file_name):
-            with open(file_name, "rb") as f:
-                st.download_button(
-                    label="📥 最新の回答データをダウンロードする (CSV)",
-                    data=f,
-                    file_name="attendance_results.csv",
-                    mime="text/csv"
-                )
-        else:
-            st.info("まだ回答データはありません。")
+        st.info("💡 回答データはGoogleスプレッドシートに直接保存されています。以下のリンクからスプレッドシートをご確認ください。")
+        
+        # スプレッドシートへのリンクボタン
+        st.link_button("📊 Googleスプレッドシートを開く", "https://docs.google.com/spreadsheets/u/0/")
             
         st.write("---")
         if st.button("ログアウトして回答ページに戻る"):
@@ -94,25 +88,27 @@ elif st.session_state["page"] == "user":
         if not name_kanji or not name_furigana:
             st.warning("⚠️ お名前（漢字とふりがな）は必須です。入力してください。")
         else:
-            file_name = "secret_attendance_results.csv"
-            
-            new_data = pd.DataFrame([{
+            # 送信データのまとめ
+            payload = {
                 "日時": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "お名前（漢字）": name_kanji,
-                "お名前（ふりがな）": name_furigana,
+                "お名前漢字": name_kanji,
+                "お名前ふりがな": name_furigana,
                 "出欠": attendance_status,
                 "参加日程": days_choice,
                 "金曜懇親会": friday_party,
                 "土曜懇親会": saturday_party,
                 "職業": occupation
-            }])
+            }
             
-            if os.path.exists(file_name):
-                new_data.to_csv(file_name, mode='a', header=False, index=False, encoding='utf-8-sig')
-            else:
-                new_data.to_csv(file_name, index=False, encoding='utf-8-sig')
-                
-            st.success(f"🎉 {name_kanji}さんの回答を受け付けました！ご協力ありがとうございます。")
+            try:
+                # Googleスプレッドシート（GAS）へデータを送信
+                response = requests.post(GAS_URL, json=payload)
+                if response.status_code == 200:
+                    st.success(f"🎉 {name_kanji}さんの回答を受け付けました！ご協力ありがとうございます。")
+                else:
+                    st.error("⚠️ データの送信に失敗しました。時間をおいて再度お試しください。")
+            except Exception as e:
+                st.error(f"⚠️ エラーが発生しました: {e}")
 
     # 画面の最下部にひっそりと「管理者用ページへ移動する」ボタンを配置
     st.write("---")
