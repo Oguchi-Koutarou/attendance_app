@@ -57,7 +57,7 @@ elif st.session_state["page"] == "user":
     if attendance_status == "参加":
         st.markdown("---")
         st.subheader("3. 参加日程について")
-        days_choice = st.radio("参加日程 *", ["両日参加", "金曜のみ参加", "土曜のみ参加"])
+        days_choice = st.radio("参加日程 *", ["両日参加", "金曜（11/13）のみ参加", "土曜（11/14）のみ参加"])
         
         st.markdown("---")
         st.subheader("4. 懇親会について")
