@@ -2,7 +2,7 @@ import streamlit as st
 from datetime import datetime
 import requests
 
-# ★GASのURLを貼り付けてください
+# ★GASのURL
 GAS_URL = "https://script.google.com/macros/s/AKfycbxmYi3zgPNbPqovN-99kbnTQjrczsXfvRxWF4GG2OA916UyFvyCDqJM-7gWI6Qj7JyMbg/exec"
 
 # セッション状態の初期化
@@ -95,14 +95,18 @@ elif st.session_state["page"] == "user":
                 "教員協力": prof_cooperation,
                 "学生発表": student_presentation
             }
+            
+            # ここに「送信中」のスピナーを追加しました
             try:
-                response = requests.post(GAS_URL, json=payload)
+                with st.spinner("送信中です... しばらくお待ちください。"):
+                    response = requests.post(GAS_URL, json=payload)
+                
                 if response.status_code == 200:
                     st.success("🎉 回答を受け付けました！")
                 else:
-                    st.error("⚠️ 送信失敗")
+                    st.error(f"⚠️ 送信に失敗しました（エラーコード: {response.status_code}）。再度お試しください。")
             except Exception as e:
-                st.error(f"エラー: {e}")
+                st.error(f"⚠️ エラーが発生しました: {e}")
 
     if st.button("管理者用ページへ移動する"):
         st.session_state["page"] = "admin"
