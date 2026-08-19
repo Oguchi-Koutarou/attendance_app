@@ -1,5 +1,5 @@
 import streamlit as st
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import requests
 
 # ★GASのURL
@@ -81,8 +81,12 @@ elif st.session_state["page"] == "user":
         if not name_kanji or not name_furigana or (attendance_status == "参加" and not affiliation):
             st.warning("⚠️ 必須項目を入力してください。")
         else:
+            # 日本標準時間（JST = UTC+9）の現在時刻を取得
+            jst = timezone(timedelta(hours=9))
+            jst_now = datetime.now(jst).strftime("%Y-%m-%d %H:%M:%S")
+
             payload = {
-                "日時": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "日時": jst_now,
                 "お名前漢字": name_kanji,
                 "お名前ふりがな": name_furigana,
                 "出欠": attendance_status,
@@ -96,7 +100,6 @@ elif st.session_state["page"] == "user":
                 "学生発表": student_presentation
             }
             
-            # ここに「送信中」のスピナーを追加しました
             try:
                 with st.spinner("送信中です... しばらくお待ちください。"):
                     response = requests.post(GAS_URL, json=payload)
