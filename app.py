@@ -2,7 +2,7 @@ import streamlit as st
 from datetime import datetime
 import requests
 
-# Google Apps ScriptのウェブアプリのURL
+# ★GASのURLを貼り付けてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbxmYi3zgPNbPqovN-99kbnTQjrczsXfvRxWF4GG2OA916UyFvyCDqJM-7gWI6Qj7JyMbg/exec"
 
 # セッション状態の初期化
@@ -51,7 +51,8 @@ elif st.session_state["page"] == "user":
     attendance_status = st.radio("イベントへの参加について", ["参加", "不参加"])
 
     days_choice, friday_party, saturday_party = "ー", "ー", "ー"
-    occupation, affiliation, ob_cooperation, prof_cooperation = "ー", "ー", "ー", "ー"
+    occupation, affiliation = "ー", "ー"
+    ob_cooperation, prof_cooperation, student_presentation = "ー", "ー", "ー"
 
     if attendance_status == "参加":
         st.markdown("---")
@@ -68,11 +69,12 @@ elif st.session_state["page"] == "user":
         occupation = st.selectbox("職業 *", ["学生", "教員", "企業", "その他"])
         affiliation = st.text_input("学校名または会社名 *")
 
-        # 職業別質問
         if occupation == "企業":
             ob_cooperation = st.radio("OBからの会社紹介（15分程度）へご協力していただけますか？", ["はい", "いいえ"])
         elif occupation == "教員":
             prof_cooperation = st.radio("研究室紹介にご協力いただけますか？", ["はい", "いいえ"])
+        elif occupation == "学生":
+            student_presentation = st.radio("2日目にポスター形式にて研究発表を予定しています。発表しますか？", ["はい", "いいえ"])
 
     st.markdown("---")
     if st.button("回答を送信する", type="primary"):
@@ -90,7 +92,8 @@ elif st.session_state["page"] == "user":
                 "職業": occupation,
                 "所属名": affiliation,
                 "OB協力": ob_cooperation,
-                "教員協力": prof_cooperation
+                "教員協力": prof_cooperation,
+                "学生発表": student_presentation
             }
             try:
                 response = requests.post(GAS_URL, json=payload)
