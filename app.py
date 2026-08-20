@@ -53,6 +53,7 @@ elif st.session_state["page"] == "user":
     days_choice, friday_party, saturday_party = "ー", "ー", "ー"
     occupation, affiliation = "ー", "ー"
     ob_cooperation, prof_cooperation, student_presentation = "ー", "ー", "ー"
+    message = "" # 追加
 
     if attendance_status == "参加":
         st.markdown("---")
@@ -76,12 +77,16 @@ elif st.session_state["page"] == "user":
         elif occupation == "学生":
             student_presentation = st.radio("2日目にポスター形式にて研究発表を予定しています。発表しますか？", ["はい", "いいえ"])
 
+    # メッセージ入力欄（任意）
+    st.markdown("---")
+    st.subheader("6. ひと言メッセージ")
+    message = st.text_area("何かメッセージがあればご記入ください")
+
     st.markdown("---")
     if st.button("回答を送信する", type="primary"):
         if not name_kanji or not name_furigana or (attendance_status == "参加" and not affiliation):
             st.warning("⚠️ 必須項目を入力してください。")
         else:
-            # 日本標準時間（JST = UTC+9）の現在時刻を取得
             jst = timezone(timedelta(hours=9))
             jst_now = datetime.now(jst).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -97,7 +102,8 @@ elif st.session_state["page"] == "user":
                 "所属名": affiliation,
                 "OB協力": ob_cooperation,
                 "教員協力": prof_cooperation,
-                "学生発表": student_presentation
+                "学生発表": student_presentation,
+                "ひと言": message # 追加
             }
             
             try:
